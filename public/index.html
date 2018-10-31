@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Firebase Hosting</title>
+
+  <script src="dist/main.bundle.js"></script>
+
+  <style media="screen">
+    html,
+    body {
+      width: 100%;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    h1 {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="background: honeydew; padding: 8px">
+    <div style="background-color: grey;display: flex;  height:100px; margin-right:3px;align-items: center;text-align:center;flex-direction: column;
+      justify-content: center; font-size: 1.2em;">
+      <h1>BOTNET</h1>
+    </div>
+    <h2>Abstract</h2>
+    <p>Este artículo consiste en la presentación y comparación de las distintas metodologías existentes para el manejo
+      de
+      asincronicidad en el lenguaje Javascript. Para esto se planea hacer una breve introducción teórica a cada
+      enfoque,
+      una comparación desde un punto de vista de facilidad de uso y estilo de código. Para concluir se desarrollará,
+      utilizando uno de los métodos expuestos, un botnet.</p>
+    <h2>¿Qué problema se resuelve?</h2>
+    <p>Un modelo asincrónico permite que sucedan varias cosas al mismo tiempo, a diferencia del sincrónico en el cual
+      las
+      cosas van sucediendo una por vez lo cual hace que el programa cuando llama una función que realiza una acción de
+      larga
+      duración sólo retoma su ejecución cuando la acción ha finalizado. Por lo tanto, resulta más eficiente el uso del
+      modelo
+      asincrónico que cuando comienza a ejecutar una acción, el programa continúa ejecutándose y cuando la acción
+      termina se
+      informa al programa que obtiene acceso al resultado.</p>
+    <h2>Callbacks</h2>
+    <p>En programación un callback es una función de “A” que se usa como argumento de otra función “B”. Cuando se llama
+      a "B",
+      ésta ejecuta "A". Para conseguirlo, usualmente lo que se pasa a "B" es el puntero a "A".
+      Los callbacks tienen un montón de utilidades muy necesarias en programación, como podría ser una función que lee
+      un archivo
+      de configuración y que asocia valores con opciones; pero en esta ocasión nos será muy útil dado que utilizaremos
+      un modelo
+      asíncrono, entonces utilizaremos el mismo para que se ejecute cuando el dato esté listo.</p>
+    <div style="width: 100%">
+      <code> export function readFileCallback() {
+                  fs.readFile(`${__dirname}/../${FILE_NAME}`, 'utf8', (err, data) => {
+                      if (err) {
+                          console.error(err);
+                          return;
+                      }
+                      console.log('callback ready');
+                  });
+          }
+                  </code>
+    </div>
+    <h2>Promise</h2>
+    <p>Una Promise es un objeto que representa la finalización o el fracaso eventual de una operación asíncrona, es un
+      objeto
+      al cual se pasan las funciones callback en lugar de pasarlas a una función. Beneficios de usar Promises:</p>
+    <li>Las funciones callback nunca serán llamadas antes de la terminación de la ejecución actual del bucle de eventos
+      de
+      Javascript.</li>
+    <li>Las funciones callback añadidas con .then serán llamadas después del éxito o fracaso de la operación asíncrona,
+      como
+      arriba.</li>
+    <li>Pueden ser añadidas múltiples funciones callback llamando a .then varias veces, para ser ejecutadas
+      independientemente
+      en el orden de inserción.</li>
+    <li>El beneficio más inmediato de las promesas es el encadenamiento.</li>
+    <code>export function readFilePromise() {
+      readFile(`${__dirname}/../${FILE_NAME}`)
+          .then(data => console.log('promise ready'))
+          .catch(err => console.error(err));
+}
+      </code>
+    <h2>Async Functions</h2>
+    <p>Las funciones asíncronas que ofrece el lenguaje Javascript son lo que se llama “azúcar sintáctica” para las
+      Promises.
+      Es decir, cuando utilizamos Javascript en una especificación de ES6 en adelante tenemos la posibilidad de usar
+      tanto
+      Promises como async functions indistintamente ya que al “compilar” una función de este tipo se genera un código
+      equivalente.
+      Compilar es un término no 100% adecuado para este contexto porque Javascript no es un lenguaje que se compile,
+      pero dado
+      que las implementaciones de los intérpretes no están siempre al día utilidades como Typescript y Babel permiten
+      transformar código moderno a código soportado por más intérpretes.</p>
+    <code>export async function readFileAsync() {
+      try {
+          // Usa la misma función readFile del ejemplo anterior
+          const data = await readFile(`${__dirname}/../${FILE_NAME}`);
+          console.log('async ready');
+      } catch(e) {
+          console.error(e);
+      }
+}
+      </code>
+    <h2>Rx o Reactive Extensions</h2>
+    <p>Como dice la documentación oficial, son una API para programación asíncrona usando streams observables. En
+      resumen,
+      es una combinación de las mejores ideas del patrón observer, iterator y programación funcional. La principal
+      diferencia
+      de este enfoque es que es válido no solo para Javascript sino que también lo es para muchos otros lenguajes
+      populares hoy
+      en día.
+      Cuando uno trabaja con un Observable uno está manejando un stream de datos, concepto extrapolable a una línea de
+      tiempo
+      a lo largo de la cual se emiten valores. Un Observable que emite un valor sólo en su ciclo de vida es equivalente
+      a usar
+      una Promise. Además, cuando uno observa uno de estos streams puede hacer uso de los muchos operadores que existen
+      para
+      modificar los valores emitidos de acuerdo a las necesidades del problema.</p>
+    <code>export function readFileObservable() {
+      // Usa la misma función readFile del ejemplo anterior y la transforma en Observable
+      // Este código demuestra también la utilidad de los Observables con sus operadores
+      // map transforma el contenido del archivo a un array de string usando el método split
+      // mergeMap hace que el observable en lugar de emitir un array emita los valores del mismo por separado
+      // skip se saltea los dos primeros valores y take toma los siete siguientes
+      from(readFile(`${__dirname}/../${FILE_NAME}`)).pipe(
+          map(data => data.split(' ')),
+          mergeMap(splitString => splitString),
+          skip(2),
+          take(7)
+          ).subscribe(word => console.log(word));
+}
+      </code>
+    <h2>Comparación</h2>
+    <p>Hay varios enfoques que se pueden tomar a la hora de comparar estas técnicas. En cuanto a la facilidad de uso y
+      lectura,
+      las funciones asíncronas son uno de los más importantes aportes que ha recibido el lenguaje Javascript en mucho
+      tiempo
+      dada la facilidad con la que proveyó a toda la gente que quiso adoptar el lenguaje en los últimos años y a los
+      desarrolladores
+      con más experiencia.
+      En cuanto a versatilidad, los Observables en la programación reactiva permiten resolver muchos más problemas del
+      día a día
+      puesto que a diferencia de las Promises que emiten un valor solo (o tiran error) y terminan su ciclo de vida,
+      los Observables permiten emitir n valores a lo largo de su ciclo de vida y se puede hacer que las suscripciones a
+      ellos
+      terminen cuando sea conveniente de un modo tanto declarativo como imperativo.
+    </p>
+    <h2>Conclusión</h2>
+    <p>En conclusión, los callbacks nunca van a desaparecer ya que hay problemas en los que son la solución predilecta
+      (hacer endpoints en Node con Express) pero entre Promises y Observables la gran mayoría de los problemas son
+      resolubles
+      de un modo más elegante y más fácil de entender. No hay un claro ganador en todas las categorías, la única
+      respuesta a la
+      pregunta “¿qué uso?” es que uno debe usar lo que más fácil le resulte de entender siempre dentro de las
+      limitaciones de
+      cada tecnología.</p>
+
+  </div>
+</body>
+
+</html>
