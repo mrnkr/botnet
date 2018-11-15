@@ -18,7 +18,7 @@ El objetivo planteado es el de, utilizando algunas de las herramientas de manejo
 ```
 5. Mirar la consola en el navegador, si no pasa nada, refrescar el portal y enviar nuevamente la solicitud
 
-### Como usar
+### Como usar el codigo de este repositorio
 
 ```
 git clone https://github.com/mrnkr/botnet.git
