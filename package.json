@@ -12,8 +12,8 @@
     "url": "git+https://github.com/mrnkr/botnet.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "MrNKR",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mrnkr/botnet/issues"
   },
